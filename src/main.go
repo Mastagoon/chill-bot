@@ -26,7 +26,7 @@ type List struct {
 }
 
 var list map[string]Record
-var insults = []string{"يا.. يا.. ياكثير الكلام!","ايها الأرعن","يا مغفل", "يا ثرثار", "يا مزعج", "يا متطفل", "يا ضعيف الإرادة", "يا أحمق", "يا متعجرف"}
+var insults = []string{"يا اكحل العينين","يا.. يا.. يا كثير الكلام!","ايها الأرعن","يا مغفل", "يا ثرثار", "يا مزعج", "يا متطفل", "يا ضعيف الإرادة", "يا أحمق", "يا متعجرف"}
 var MAX_MESSAGES = 10
 
 func main() {
@@ -89,6 +89,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		s.GuildMemberTimeout(m.GuildID, m.Author.ID, &t)
 		s.ChannelMessageSend(m.ChannelID,
 			fmt.Sprintf("<@%s>\nلقد تجاوزت الحد الأقصى من الرسائل خلال 10 دقائق, %s", m.Author.ID, insults[rand.Intn(len(insults))]))
+			if(rand.Intn(10) == 9){
+				fmt.Sprintf("<@679348712472051715> تعال شوفله حل ياخي!")
+			}
 		list[m.Author.ID] = Record{Count: 1, OldestMessageTime: m.Timestamp}
 	}
 }
