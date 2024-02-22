@@ -1,4 +1,4 @@
-package main
+cpackage main
 
 import (
 	"fmt"
@@ -26,7 +26,7 @@ type List struct {
 }
 
 var list map[string]Record
-var insults = []string{"يا مغفل", "يا ثرثار", "يا مزعج", "يا متطفل", "يا ضعيف الإرادة", "يا أحمق", "يا متعجرف"}
+var insults = []string{"يا.. يا.. ياكثير الكلام!","ايها الأرعن","يا مغفل", "يا ثرثار", "يا مزعج", "يا متطفل", "يا ضعيف الإرادة", "يا أحمق", "يا متعجرف"}
 var MAX_MESSAGES = 10
 
 func main() {
