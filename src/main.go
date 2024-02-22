@@ -90,7 +90,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		s.ChannelMessageSend(m.ChannelID,
 			fmt.Sprintf("<@%s>\nلقد تجاوزت الحد الأقصى من الرسائل خلال 10 دقائق, %s", m.Author.ID, insults[rand.Intn(len(insults))]))
 			if(rand.Intn(10) == 9){
-				fmt.Print("<@679348712472051715> تعال شوفله حل ياخي!")
+				s.ChannelMessageSend(m.ChannelID,"<@679348712472051715> تعال شوفله حل ياخي!")
 			}
 		list[m.Author.ID] = Record{Count: 1, OldestMessageTime: m.Timestamp}
 	}
