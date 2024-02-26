@@ -84,11 +84,15 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			list[m.Author.ID] = Record{Count: list[m.Author.ID].Count + 1, OldestMessageTime: r.OldestMessageTime}
 		}
 	}
-	if list[m.Author.ID].Count >= MAX_MESSAGES {
-		t := time.Now().Add(10 * time.Minute)
+	length := len(strings.Split(m.Content, " "))
+	if list[m.Author.ID].Count >= MAX_MESSAGES || length >= 20{
+		t := time.Now().Add(30 * time.Minute)
 		s.GuildMemberTimeout(m.GuildID, m.Author.ID, &t)
 		s.ChannelMessageSend(m.ChannelID,
 			fmt.Sprintf("<@%s>\nلقد تجاوزت الحد الأقصى من الرسائل خلال 10 دقائق, %s", m.Author.ID, insults[rand.Intn(len(insults))]))
+		if length >= 20 {
+			s.ChannelMessageDelete(m.ChannelID, m.ID)
+		}
 		list[m.Author.ID] = Record{Count: 1, OldestMessageTime: m.Timestamp}
 	}
 }
