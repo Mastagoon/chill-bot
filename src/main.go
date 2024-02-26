@@ -18,7 +18,7 @@ import (
 type Record struct {
 	Count             int
 	OldestMessageTime time.Time
-	IsMuted           bool
+	WordCount				 int
 }
 
 type List struct {
@@ -74,25 +74,26 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			}
 		}
 	}
+	length := len(strings.Split(m.Content, " "))
+	if m.Attachments != nil {
+		length += 10
+	}
 	if r, ok := list[m.Author.ID]; !ok {
-		list[m.Author.ID] = Record{Count: 1, OldestMessageTime: m.Timestamp}
+		list[m.Author.ID] = Record{Count: 1, OldestMessageTime: m.Timestamp, WordCount: length}
 		return
 	} else {
 		if r.OldestMessageTime.Before(time.Now().Add(-10 * time.Minute)) { // reset
-			list[m.Author.ID] = Record{Count: 1, OldestMessageTime: m.Timestamp}
+			list[m.Author.ID] = Record{Count: 1, OldestMessageTime: m.Timestamp, WordCount: 0}
 		} else {
-			list[m.Author.ID] = Record{Count: list[m.Author.ID].Count + 1, OldestMessageTime: r.OldestMessageTime}
+			list[m.Author.ID] = Record{Count: list[m.Author.ID].Count + 1, OldestMessageTime: r.OldestMessageTime, WordCount: list[m.Author.ID].WordCount + length}
 		}
 	}
-	length := len(strings.Split(m.Content, " "))
-	if list[m.Author.ID].Count >= MAX_MESSAGES || length >= 20 {
+	if list[m.Author.ID].Count >= MAX_MESSAGES || list[m.Author.ID].WordCount >= 20 {
 		t := time.Now().Add(30 * time.Minute)
 		s.GuildMemberTimeout(m.GuildID, m.Author.ID, &t)
 		s.ChannelMessageSend(m.ChannelID,
 			fmt.Sprintf("<@%s>\nلقد تجاوزت الحد الأقصى من الرسائل خلال 10 دقائق, %s", m.Author.ID, insults[rand.Intn(len(insults))]))
-		if length >= 20 {
-			s.ChannelMessageDelete(m.ChannelID, m.ID)
-		}
+		s.ChannelMessageDelete(m.ChannelID, m.ID)
 		if rand.Intn(10) == 9 {
 			s.ChannelMessageSend(m.ChannelID, "<@679348712472051715> تعال شوفله حل ياخي!")
 		}
