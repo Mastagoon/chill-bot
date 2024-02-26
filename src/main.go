@@ -26,7 +26,7 @@ type List struct {
 }
 
 var list map[string]Record
-var insults = []string{"يا مغفل", "يا ثرثار", "يا مزعج", "يا متطفل", "يا ضعيف الإرادة", "يا أحمق", "يا متعجرف"}
+var insults = []string{"يا اكحل العينين","يا.. يا.. يا كثير الكلام!","ايها الأرعن","يا مغفل", "يا ثرثار", "يا مزعج", "يا متطفل", "يا ضعيف الإرادة", "يا أحمق", "يا متعجرف"}
 var MAX_MESSAGES = 10
 
 func main() {
@@ -93,6 +93,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		if length >= 20 {
 			s.ChannelMessageDelete(m.ChannelID, m.ID)
 		}
+			if(rand.Intn(10) == 9){
+				s.ChannelMessageSend(m.ChannelID,"<@679348712472051715> تعال شوفله حل ياخي!")
+			}
 		list[m.Author.ID] = Record{Count: 1, OldestMessageTime: m.Timestamp}
 	}
 }
