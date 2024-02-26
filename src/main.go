@@ -80,7 +80,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	if r, ok := list[m.Author.ID]; !ok {
 		list[m.Author.ID] = Record{Count: 1, OldestMessageTime: m.Timestamp, WordCount: length}
-		return
 	} else {
 		if r.OldestMessageTime.Before(time.Now().Add(-10 * time.Minute)) { // reset
 			list[m.Author.ID] = Record{Count: 1, OldestMessageTime: m.Timestamp, WordCount: 0}
