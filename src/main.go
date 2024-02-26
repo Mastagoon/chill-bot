@@ -26,7 +26,7 @@ type List struct {
 }
 
 var list map[string]Record
-var insults = []string{"يا اكحل العينين","يا.. يا.. يا كثير الكلام!","ايها الأرعن","يا مغفل", "يا ثرثار", "يا مزعج", "يا متطفل", "يا ضعيف الإرادة", "يا أحمق", "يا متعجرف"}
+var insults = []string{"يا اكحل العينين", "يا.. يا.. يا كثير الكلام!", "ايها الأرعن", "يا مغفل", "يا ثرثار", "يا مزعج", "يا متطفل", "يا ضعيف الإرادة", "يا أحمق", "يا متعجرف"}
 var MAX_MESSAGES = 10
 
 func main() {
@@ -85,7 +85,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 	length := len(strings.Split(m.Content, " "))
-	if list[m.Author.ID].Count >= MAX_MESSAGES || length >= 20{
+	if list[m.Author.ID].Count >= MAX_MESSAGES || length >= 20 {
 		t := time.Now().Add(30 * time.Minute)
 		s.GuildMemberTimeout(m.GuildID, m.Author.ID, &t)
 		s.ChannelMessageSend(m.ChannelID,
@@ -93,9 +93,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		if length >= 20 {
 			s.ChannelMessageDelete(m.ChannelID, m.ID)
 		}
-			if(rand.Intn(10) == 9){
-				s.ChannelMessageSend(m.ChannelID,"<@679348712472051715> تعال شوفله حل ياخي!")
-			}
+		if rand.Intn(10) == 9 {
+			s.ChannelMessageSend(m.ChannelID, "<@679348712472051715> تعال شوفله حل ياخي!")
+		}
 		list[m.Author.ID] = Record{Count: 1, OldestMessageTime: m.Timestamp}
 	}
 }
