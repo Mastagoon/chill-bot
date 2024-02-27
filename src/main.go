@@ -75,8 +75,8 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 	length := len(strings.Split(m.Content, " "))
-	if m.Attachments != nil {
-		length += 10
+	if len(m.Attachments) > 0 {
+		length += 20
 	}
 	if r, ok := list[m.Author.ID]; !ok {
 		list[m.Author.ID] = Record{Count: 1, OldestMessageTime: m.Timestamp, WordCount: length}
