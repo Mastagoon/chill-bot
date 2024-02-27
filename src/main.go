@@ -79,6 +79,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if len(m.Attachments) > 0 {
 		length += 20
 	}
+	length += len(m.Content) / 5
 	var r *Record
 	var ok bool
 	if r, ok = list[m.Author.ID]; !ok {
