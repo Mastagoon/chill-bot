@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"math/rand"
 	"os"
 	"os/signal"
 	"strconv"
@@ -18,14 +17,15 @@ import (
 type Record struct {
 	Count             int
 	OldestMessageTime time.Time
-	WordCount				 int
+	WordCount         int
+	IsMuted           bool
 }
 
 type List struct {
 	records []Record
 }
 
-var list map[string]Record
+var list map[string]*Record
 var insults = []string{"يا اكحل العينين", "يا.. يا.. يا كثير الكلام!", "ايها الأرعن", "يا مغفل", "يا ثرثار", "يا مزعج", "يا متطفل", "يا ضعيف الإرادة", "يا أحمق", "يا متعجرف"}
 var MAX_MESSAGES = 10
 
@@ -49,7 +49,7 @@ func main() {
 		return
 	}
 
-	list = make(map[string]Record)
+	list = make(map[string]*Record)
 
 	// Wait here until CTRL-C or other term signal is received.
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
@@ -78,25 +78,30 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if len(m.Attachments) > 0 {
 		length += 20
 	}
-	if r, ok := list[m.Author.ID]; !ok {
-		list[m.Author.ID] = Record{Count: 1, OldestMessageTime: m.Timestamp, WordCount: length}
+	var r *Record
+	var ok bool
+	if r, ok = list[m.Author.ID]; !ok {
+		list[m.Author.ID] = &Record{Count: 1, OldestMessageTime: m.Timestamp, WordCount: length}
+		r = list[m.Author.ID]
 	} else {
+		if r.IsMuted {
+			if r.OldestMessageTime.Before(time.Now().Add(-10 * time.Minute)) {
+				r.IsMuted = false
+			} else {
+				r.OldestMessageTime = m.Timestamp
+			}
+		}
 		if r.OldestMessageTime.Before(time.Now().Add(-10 * time.Minute)) { // reset
-			list[m.Author.ID] = Record{Count: 1, OldestMessageTime: m.Timestamp, WordCount: 0}
-		} else {
-			list[m.Author.ID] = Record{Count: list[m.Author.ID].Count + 1, OldestMessageTime: r.OldestMessageTime, WordCount: list[m.Author.ID].WordCount + length}
+			r.Count = 1
+			r.WordCount = length
+		} else { //not muted, not reset
+			r.Count++
+			r.WordCount += length
 		}
 	}
-	if list[m.Author.ID].Count >= MAX_MESSAGES || list[m.Author.ID].WordCount >= 20 {
-		t := time.Now().Add(30 * time.Minute)
-		s.GuildMemberTimeout(m.GuildID, m.Author.ID, &t)
-		s.ChannelMessageSend(m.ChannelID,
-			fmt.Sprintf("<@%s>\nلقد تجاوزت الحد الأقصى من الرسائل خلال 10 دقائق, %s", m.Author.ID, insults[rand.Intn(len(insults))]))
+	if r.Count > MAX_MESSAGES || r.WordCount > 20 || r.IsMuted {
+		r.IsMuted = true
 		s.ChannelMessageDelete(m.ChannelID, m.ID)
-		if rand.Intn(10) == 9 {
-			s.ChannelMessageSend(m.ChannelID, "<@679348712472051715> تعال شوفله حل ياخي!")
-		}
-		list[m.Author.ID] = Record{Count: 1, OldestMessageTime: m.Timestamp}
 	}
 }
 
