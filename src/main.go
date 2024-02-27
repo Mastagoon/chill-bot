@@ -41,6 +41,7 @@ func main() {
 		log.Fatal(err)
 	}
 	discord.AddHandler(messageCreate)
+	discord.AddHandler(messageEdit)
 	discord.AddHandler(ready)
 	discord.Identify.Intents = discordgo.IntentsGuildMessages
 	err = discord.Open()
@@ -103,6 +104,10 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		r.IsMuted = true
 		s.ChannelMessageDelete(m.ChannelID, m.ID)
 	}
+}
+
+func messageEdit(s *discordgo.Session, m *discordgo.MessageUpdate) {
+	messageCreate(s, &discordgo.MessageCreate{Message: m.Message})
 }
 
 func ready(s *discordgo.Session, event *discordgo.Ready) {
